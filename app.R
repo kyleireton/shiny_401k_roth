@@ -175,7 +175,7 @@ server <- function(input, output) {
                      
                      geom_text(aes(label = Amount), nudge_y = 2500) +
                      
-                     labs(title = "Paycheck Breakdown",
+                     labs(title = "Annual Breakdown",
                           
                           y = "Amount") +
                      
