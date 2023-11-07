@@ -55,6 +55,14 @@ ui <- fluidPage(
     sidebarPanel(
       
       sliderInput(
+        "yrs_contributing",
+        "Years making contributions",
+        value = 30,
+        min = 1,
+        max = 50
+      ),
+      
+      sliderInput(
         "yrs_pre_retire",
         "Years until retirement",
         value = 30,
@@ -96,7 +104,7 @@ ui <- fluidPage(
       
       sliderInput(
         "yrs_post_retire",
-        "Years After Retirement (no other income)",
+        "Years After Retirement",
         value = 15,
         min = 1,
         max = 40
@@ -134,6 +142,8 @@ server <- function(input, output) {
                  ROI <- input$percent_growth / 100
                  
                  yrs_growth <- input$yrs_pre_retire
+                 
+                 yrs_contributing <- input$yrs_contributing
                 
                  # income
                   
@@ -163,18 +173,36 @@ server <- function(input, output) {
                  
                  # how much will tax savings generate in extra investment growth? 
                  
-                 compound_trad <- ((withhold_401k * income_base) + tax_savings) *
+                 compound_trad_contrib <- ((withhold_401k * income_base) + tax_savings) *
                    
-                   (((1 + ROI) ^ yrs_growth - 1) / ROI)
+                   (((1 + ROI) ^ yrs_contributing - 1) / ROI)
+                 
+                 compound_trad_mature <- ((compound_trad_contrib * 
+                                             
+                                             (1 + ROI ) ^ (yrs_growth - yrs_contributing)) -
+                                            
+                                                compound_trad_contrib)
+                 
+                 compound_trad <- compound_trad_contrib + compound_trad_mature
                  
                  trad_save <- round(compound_trad)
                  
                  trad_save
                  
                  
-                 compound_roth <- (withhold_401k * income_base) *
+                 # compare to roth growth w/o extra savings? 
+                 
+                 compound_roth_contrib <- ((withhold_401k * income_base)) *
                    
-                   (((1 + ROI) ^ yrs_growth - 1) / ROI)
+                   (((1 + ROI) ^ yrs_contributing - 1) / ROI)
+                 
+                 compound_roth_mature <- ((compound_roth_contrib * 
+                                             
+                                             (1 + ROI ) ^ (yrs_growth - yrs_contributing)) -
+                                            
+                                            compound_roth_contrib)
+                 
+                 compound_roth <- compound_roth_contrib + compound_roth_mature
                  
                  roth_save <- round(compound_roth)
                  
